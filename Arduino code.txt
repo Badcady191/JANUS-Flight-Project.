@@ -1,0 +1,102 @@
+#define NUM_READINGS 3  // smaller = faster reaction
+
+int readings[NUM_READINGS]; 
+int indexFilter = 0;
+long total = 0;  
+int baselinePressure = 0;
+
+enum State { ASCENDING, DESCENDING, APOGEE };
+State currentState = DESCENDING;
+
+const int ledAscend = 11;   // green
+const int ledDescend = 13;  // red
+const int ledApogee = 12;   // yellow
+const int buzzer = 8;       // buzzer
+
+unsigned long lastUpdate = 0;
+int prevReading = 0;
+
+void initFilter() {
+  for (int i = 0; i < NUM_READINGS; i++) readings[i] = 0;
+  total = 0;
+  indexFilter = 0;
+}
+
+int movingAverage(int newValue) {
+  total -= readings[indexFilter];
+  readings[indexFilter] = newValue;
+  total += readings[indexFilter];
+  indexFilter = (indexFilter + 1) % NUM_READINGS;
+  return (int)(total / NUM_READINGS);
+}
+
+void setup() {
+  pinMode(ledAscend, OUTPUT);
+  pinMode(ledDescend, OUTPUT);
+  pinMode(ledApogee, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+
+  Serial.begin(9600);
+  initFilter();
+
+  // Baseline calibration
+  long sum = 0;
+  for (int i = 0; i < 20; i++) {
+    sum += analogRead(A0);
+    delay(10);
+  }
+  baselinePressure = sum / 20;
+  Serial.print("Baseline: ");
+  Serial.println(baselinePressure);
+
+  currentState = DESCENDING;
+}
+
+// --- Extra variables ---
+unsigned long apogeeTime = 0;
+bool apogeeActive = false;
+
+void loop() {
+  int rawValue = analogRead(A0);
+  int filtered = movingAverage(rawValue);
+
+  int trend = filtered - prevReading;  // detect direction
+
+  // --- Detect ASCENT quickly ---
+  if (trend < -2) {   // pressure decreasing = going up
+    if (currentState != ASCENDING) {
+      currentState = ASCENDING;
+      Serial.println("Ascending");
+    }
+  } 
+  // --- Detect DESCENT quickly ---
+  else if (trend > 2) {  // pressure increasing = going down
+    if (currentState == ASCENDING) {
+      // Apogee detected (instant)
+      Serial.println("Apogee!");
+      digitalWrite(ledApogee, HIGH);
+      tone(buzzer, 1000, 300);   // short beep
+      apogeeTime = millis();
+      apogeeActive = true;
+
+      currentState = DESCENDING; // immediate switch to DESCENDING
+    }
+    else if (currentState != DESCENDING) {
+      currentState = DESCENDING;
+      Serial.println("Descending");
+    }
+  }
+
+  // --- Auto turn off apogee LED after 400ms ---
+  if (apogeeActive && millis() - apogeeTime > 400) {
+    digitalWrite(ledApogee, LOW);
+    apogeeActive = false;
+  }
+
+  // --- LED control (instant switching) ---
+  digitalWrite(ledAscend, currentState == ASCENDING);
+  digitalWrite(ledDescend, currentState == DESCENDING);
+
+  prevReading = filtered;
+}
+
