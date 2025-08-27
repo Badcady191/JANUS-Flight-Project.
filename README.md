@@ -32,11 +32,17 @@ This project simulates and visualizes the flight of a model rocket using two mai
 - **Input:** Raw pressure values from `Raw_data.csv`.  
 - **Altitude Calculation (Barometric Formula):**  
   \[
-  h = \frac{T_0}{L} \Big( 1 - \Big(\frac{P}{P_0}\Big)^{\frac{RL}{Mg}} \Big)
+  T0 = 288.15      
+    L = 0.0065       
+    R = 8.314       
+    M = 0.0289644    
+    g = 9.80665
+    exponent = (R * L) / (M * g)
+    h = (T0 / L) * (1 - (P / PO) ** exponent)
   \]  
 - **Velocity Calculation:**  
   \[
-  v = \Delta h / \Delta t
+  v = \Delta h / \Delta t(=1)
   \]  
 - **Noise Filtering:** 3-point moving average for altitude & velocity.  
 - **Graph Animation:** Altitude & velocity plotted and saved as `altitude_velocity.gif`.  
@@ -45,3 +51,6 @@ This project simulates and visualizes the flight of a model rocket using two mai
 ```bash
 pip install matplotlib
 python analysis.py
+
+
+
