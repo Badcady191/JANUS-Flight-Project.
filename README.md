@@ -52,5 +52,29 @@ This project simulates and visualizes the flight of a model rocket using two mai
 pip install matplotlib
 python analysis.py
 
+# 1. Create project folder and go inside
+mkdir JANUS-Flight-Project
+cd JANUS-Flight-Project
+
+# 2. Create empty files
+echo "# JANUS Flight Project" > README.md
+echo "print('Python Analysis Placeholder')" > analysis.py
+echo "// Arduino Simulation Placeholder" > simulation.ino
+echo "time,pressure" > Raw_data.csv
+echo "" > altitude_velocity.gif   # placeholder gif
+
+# 3. Create screenshots folder
+mkdir screenshots
+echo "Tinkercad screenshots go here" > screenshots/README.md
+
+# 4. Initialize Git
+git init
+git add .
+git commit -m "Initial project structure"
+
+# 5. Connect to GitHub (replace with your repo link!)
+git remote add origin https://github.com/YOUR-USERNAME/JANUS-Flight-Project.git
+git branch -M main
+git push -u origin main
 
 
