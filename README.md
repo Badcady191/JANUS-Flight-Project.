@@ -20,11 +20,6 @@ This project simulates and visualizes the flight of a model rocket using two mai
      - 🔴 Red LED → Descending  
    - Buzzer gives a short beep at apogee.  
 
----
-
-## 🗂 Project Structure  
-
----
 
 ## ⚙️ Task 1 – Python (Data Analysis & Visualization)  
 
