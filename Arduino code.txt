@@ -6,7 +6,7 @@ long total = 0;
 int baselinePressure = 0;
 
 enum State { ASCENDING, DESCENDING, APOGEE };
-State currentState = DESCENDING;
+State currentState = ASCENDING;
 
 const int ledAscend = 11;   // green
 const int ledDescend = 13;  // red
